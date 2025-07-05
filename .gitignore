@@ -9,6 +9,8 @@ dist/
 build/
 
 # Compiled JavaScript files (keep TypeScript source only)
+*.js
+*.js.map
 examples/*.js
 examples/*.js.map
 

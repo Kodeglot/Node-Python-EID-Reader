@@ -155,19 +155,37 @@ Custom error class with error codes for better error handling.
 
 ## Electron Integration
 
-This package works seamlessly in Electron applications. Here's an example:
+This package works seamlessly in Electron applications with built-in enable/disable functionality. Here's an example:
 
 ```javascript
 // main.js (Electron main process)
 import { readEidData } from '@kodeglot/belgian-eid-reader';
 
+let eidReaderEnabled = true; // Default to enabled
+
+// Handle eID reading with enable/disable check
 ipcMain.handle('read-eid', async (event) => {
+  if (!eidReaderEnabled) {
+    return { success: false, error: 'eID reader is disabled', code: 'DISABLED' };
+  }
+  
   try {
     const eidData = await readEidData({ verbose: true });
     return { success: true, data: eidData };
   } catch (error) {
     return { success: false, error: error.message, code: error.code };
   }
+});
+
+// Handle enable/disable eID reader
+ipcMain.handle('set-eid-enabled', async (event, enabled) => {
+  eidReaderEnabled = enabled;
+  return { success: true, enabled: eidReaderEnabled };
+});
+
+// Handle get eID reader status
+ipcMain.handle('get-eid-status', async () => {
+  return { success: true, enabled: eidReaderEnabled };
 });
 ```
 
@@ -180,6 +198,8 @@ async function readEID() {
     const result = await ipcRenderer.invoke('read-eid');
     if (result.success) {
       console.log('eID data:', result.data);
+    } else if (result.code === 'DISABLED') {
+      console.log('eID reader is disabled');
     } else {
       console.error('Failed:', result.error);
     }
@@ -187,7 +207,39 @@ async function readEID() {
     console.error('IPC error:', error);
   }
 }
+
+async function toggleEidReader(enabled) {
+  try {
+    const result = await ipcRenderer.invoke('set-eid-enabled', enabled);
+    if (result.success) {
+      console.log(`eID reader ${enabled ? 'enabled' : 'disabled'}`);
+    }
+  } catch (error) {
+    console.error('Toggle error:', error);
+  }
+}
+
+async function getEidStatus() {
+  try {
+    const result = await ipcRenderer.invoke('get-eid-status');
+    if (result.success) {
+      console.log(`eID reader is ${result.enabled ? 'enabled' : 'disabled'}`);
+    }
+  } catch (error) {
+    console.error('Status error:', error);
+  }
+}
 ```
+
+### Enable/Disable Features
+
+The Electron integration includes:
+
+- **Toggle Switch**: Visual toggle to enable/disable the eID reader
+- **Status Indicator**: Shows current enabled/disabled state
+- **Automatic Blocking**: Reading operations are blocked when disabled
+- **State Persistence**: Status is maintained during the app session
+- **Error Handling**: Proper error codes for disabled state
 
 ## Examples
 

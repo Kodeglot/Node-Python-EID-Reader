@@ -48,6 +48,18 @@
         .button.secondary:hover {
             background: #545B62;
         }
+        .button.danger {
+            background: #DC3545;
+        }
+        .button.danger:hover {
+            background: #C82333;
+        }
+        .button.success {
+            background: #28A745;
+        }
+        .button.success:hover {
+            background: #218838;
+        }
         .status {
             padding: 15px;
             border-radius: 6px;
@@ -68,6 +80,11 @@
             background: #D1ECF1;
             color: #0C5460;
             border: 1px solid #BEE5EB;
+        }
+        .status.warning {
+            background: #FFF3CD;
+            color: #856404;
+            border: 1px solid #FFEEBA;
         }
         .data-display {
             background: #F8F9FA;
@@ -102,11 +119,90 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+        .toggle-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 20px 0;
+            padding: 15px;
+            background: #F8F9FA;
+            border-radius: 8px;
+            border: 1px solid #DEE2E6;
+        }
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 60px;
+            height: 34px;
+            margin: 0 15px;
+        }
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 26px;
+            width: 26px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        input:checked + .slider {
+            background-color: #28A745;
+        }
+        input:checked + .slider:before {
+            transform: translateX(26px);
+        }
+        .toggle-label {
+            font-weight: 500;
+            color: #333;
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .status-indicator.enabled {
+            background-color: #28A745;
+        }
+        .status-indicator.disabled {
+            background-color: #DC3545;
+        }
     </style>
 </head>
 <body>
     <div class="container">
         <h1>🇧🇪 Belgian eID Reader</h1>
+        
+        <div class="toggle-container">
+            <span class="toggle-label">eID Reader Status:</span>
+            <label class="toggle-switch">
+                <input type="checkbox" id="eidToggle" checked>
+                <span class="slider"></span>
+            </label>
+            <span class="toggle-label" id="toggleStatus">
+                <span class="status-indicator enabled"></span>
+                Enabled
+            </span>
+        </div>
         
         <div id="status" class="status info">
             Ready to read eID data. Insert your Belgian eID card and click "Read eID Data".
@@ -118,7 +214,7 @@
         </div>
         
         <div style="text-align: center; margin: 20px 0;">
-            <button class="button" onclick="readEidData()">Read eID Data</button>
+            <button class="button" id="readButton" onclick="readEidData()">Read eID Data</button>
             <button class="button secondary" onclick="checkRequirements()">Check Requirements</button>
             <button class="button secondary" onclick="installRequirements()">Install Requirements</button>
         </div>
@@ -129,6 +225,7 @@
     <script>
         // Global state
         let isReading = false;
+        let eidEnabled = true;
 
         // Utility functions
         function showStatus(message, type = 'info') {
@@ -157,9 +254,28 @@
             dataEl.style.display = 'none';
         }
 
+        function updateToggleUI(enabled) {
+            const toggle = document.getElementById('eidToggle');
+            const status = document.getElementById('toggleStatus');
+            const readButton = document.getElementById('readButton');
+            
+            toggle.checked = enabled;
+            eidEnabled = enabled;
+            
+            if (enabled) {
+                status.innerHTML = '<span class="status-indicator enabled"></span>Enabled';
+                readButton.disabled = false;
+                readButton.className = 'button';
+            } else {
+                status.innerHTML = '<span class="status-indicator disabled"></span>Disabled';
+                readButton.disabled = true;
+                readButton.className = 'button';
+            }
+        }
+
         // API functions
         async function readEidData() {
-            if (isReading) return;
+            if (isReading || !eidEnabled) return;
             
             isReading = true;
             hideData();
@@ -173,7 +289,11 @@
                     showStatus('eID data read successfully!', 'success');
                     showData(result.data);
                 } else {
-                    showStatus(`Failed to read eID: ${result.error} (${result.code})`, 'error');
+                    if (result.code === 'DISABLED') {
+                        showStatus('eID reader is disabled. Please enable it first.', 'warning');
+                    } else {
+                        showStatus(`Failed to read eID: ${result.error} (${result.code})`, 'error');
+                    }
                 }
             } catch (error) {
                 showStatus(`Error: ${error.message}`, 'error');
@@ -224,9 +344,55 @@
             }
         }
 
+        async function toggleEidReader(enabled) {
+            try {
+                const result = await window.eidAPI.setEidEnabled(enabled);
+                
+                if (result.success) {
+                    updateToggleUI(enabled);
+                    if (enabled) {
+                        showStatus('eID reader enabled successfully!', 'success');
+                    } else {
+                        showStatus('eID reader disabled. Reading operations will be blocked.', 'warning');
+                    }
+                } else {
+                    showStatus(`Failed to update eID reader status: ${result.error}`, 'error');
+                    // Revert the toggle if the operation failed
+                    updateToggleUI(!enabled);
+                }
+            } catch (error) {
+                showStatus(`Error: ${error.message}`, 'error');
+                // Revert the toggle if the operation failed
+                updateToggleUI(!enabled);
+            }
+        }
+
+        async function getEidStatus() {
+            try {
+                const result = await window.eidAPI.getEidStatus();
+                
+                if (result.success) {
+                    updateToggleUI(result.enabled);
+                } else {
+                    console.error('Failed to get eID status:', result.error);
+                }
+            } catch (error) {
+                console.error('Error getting eID status:', error);
+            }
+        }
+
         // Initialize
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', async () => {
             console.log('Belgian eID Reader Electron example loaded');
+            
+            // Get initial eID status
+            await getEidStatus();
+            
+            // Set up toggle event listener
+            const toggle = document.getElementById('eidToggle');
+            toggle.addEventListener('change', (e) => {
+                toggleEidReader(e.target.checked);
+            });
         });
     </script>
 </body>

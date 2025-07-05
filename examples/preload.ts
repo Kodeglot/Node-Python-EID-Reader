@@ -23,6 +23,16 @@ interface EidAPI {
     installed?: boolean;
     error?: string;
   }>;
+  setEidEnabled: (enabled: boolean) => Promise<{
+    success: boolean;
+    enabled?: boolean;
+    error?: string;
+  }>;
+  getEidStatus: () => Promise<{
+    success: boolean;
+    enabled?: boolean;
+    error?: string;
+  }>;
 }
 
 // Expose protected methods that allow the renderer process to use
@@ -35,7 +45,13 @@ contextBridge.exposeInMainWorld('eidAPI', {
   checkRequirements: () => ipcRenderer.invoke('check-requirements'),
   
   // Install requirements
-  installRequirements: () => ipcRenderer.invoke('install-requirements')
+  installRequirements: () => ipcRenderer.invoke('install-requirements'),
+  
+  // Enable/disable eID reader
+  setEidEnabled: (enabled: boolean) => ipcRenderer.invoke('set-eid-enabled', enabled),
+  
+  // Get eID reader status
+  getEidStatus: () => ipcRenderer.invoke('get-eid-status')
 } as EidAPI);
 
 // Extend the global Window interface
