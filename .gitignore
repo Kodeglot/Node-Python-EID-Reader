@@ -8,6 +8,10 @@ yarn-error.log*
 dist/
 build/
 
+# Compiled JavaScript files (keep TypeScript source only)
+examples/*.js
+examples/*.js.map
+
 # TypeScript
 *.tsbuildinfo
 
