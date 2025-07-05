@@ -1,5 +1,7 @@
 # Belgian eID Reader
 
+[![npm version](https://img.shields.io/npm/v/@kodeglot/node-python-eid-reader.svg?logo=npm)](https://www.npmjs.com/package/@kodeglot/node-python-eid-reader)
+
 A cross-platform Node.js package to read Belgian eID card public data using Python eidreader with automatic dependency checking. Perfect for Electron apps and Node.js applications.
 
 ## Features
