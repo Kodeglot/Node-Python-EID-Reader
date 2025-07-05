@@ -239,6 +239,7 @@ npx @kodeglot/belgian-eid-reader
 3. **"Middleware not properly installed"**
    - Install Belgian eID middleware from [eid.belgium.be](https://eid.belgium.be)
    - On macOS, ensure the middleware is in `/Library/Belgium Identity Card/`
+   - On Windows, ensure the middleware is in `C:\Program Files\Belgium Identity Card\` or `C:\Program Files (x86)\Belgium Identity Card\`
 
 4. **"Device error"**
    - Ensure the eID card is properly inserted
