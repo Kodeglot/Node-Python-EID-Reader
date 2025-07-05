@@ -8,28 +8,55 @@ async function main() {
 
     // Check requirements first
     const reader = new EidReader({ verbose: true });
-    const { passed, results } = await reader.checkRequirements();
+    const reqResult = await reader.checkRequirements();
     
-    if (!passed) {
+    // Display info messages
+    reqResult.info.forEach(msg => console.log('INFO:', msg));
+    
+    if (!reqResult.success) {
       console.log('\n⚠️  Some requirements are missing. Attempting to install...\n');
-      const installed = await reader.installRequirements();
+      const installResult = await reader.installRequirements();
       
-      if (!installed) {
+      // Display install info messages
+      installResult.info.forEach(msg => console.log('INFO:', msg));
+      
+      if (!installResult.success) {
         console.log('\n❌ Please install the missing requirements and try again.');
+        if (installResult.error) {
+          console.log('ERROR:', installResult.error.message);
+        }
         console.log('📖 See README.md for detailed installation instructions.');
         process.exit(1);
       }
       
       // Re-check after installation
-      const { passed: recheckPassed } = await reader.checkRequirements();
-      if (!recheckPassed) {
+      const recheckResult = await reader.checkRequirements();
+      recheckResult.info.forEach(msg => console.log('INFO:', msg));
+      
+      if (!recheckResult.success) {
         console.log('\n❌ Some requirements are still missing after installation attempt.');
+        if (recheckResult.error) {
+          console.log('ERROR:', recheckResult.error.message);
+        }
         process.exit(1);
       }
     }
 
     console.log('\n🚀 Starting eID reader...\n');
-    const eidData = await reader.readEidData();
+    const eidResult = await reader.readEidData();
+    
+    // Display read info messages
+    eidResult.info.forEach(msg => console.log('INFO:', msg));
+    
+    if (!eidResult.success) {
+      console.log('\n❌ Failed to read eID data.');
+      if (eidResult.error) {
+        console.log('ERROR:', eidResult.error.message, eidResult.error.code);
+      }
+      process.exit(1);
+    }
+    
+    const eidData = eidResult.data!;
     console.log('\n--- Public eID Data ---');
     console.log(JSON.stringify(eidData, null, 2));
     console.log('\n📸 Photo data is base64-encoded.');
