@@ -1,0 +1,30 @@
+{
+  "name": "node-python-eid-reader",
+  "version": "0.1.0",
+  "description": "A cross-platform Node.js app to read Belgian eID card public data using Python eidreader",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "tsc && node dist/index.js",
+    "dev": "tsc && node dist/index.js"
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "@types/node": "^20.11.30",
+    "typescript": "^5.4.5"
+  },
+  "keywords": [
+    "eid",
+    "belgian",
+    "identity-card",
+    "python",
+    "nodejs",
+    "cross-platform"
+  ],
+  "author": "Kodeglot",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Kodeglot/Node-Python-EID-Reader.git"
+  }
+}
