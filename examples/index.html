@@ -326,18 +326,32 @@
 
         async function installRequirements() {
             showStatus('Installing requirements...', 'info');
-            
             try {
                 const result = await window.eidAPI.installRequirements();
-                
-                if (result.success) {
-                    if (result.installed) {
-                        showStatus('Requirements installed successfully! ✅', 'success');
-                    } else {
-                        showStatus('Failed to install some requirements. Please install manually.', 'error');
-                    }
+
+                if (result.success && result.installed) {
+                    showStatus('Requirements installed successfully! ✅', 'success');
                 } else {
-                    showStatus(`Failed to install requirements: ${result.error}`, 'error');
+                    // Check if all requirements are already available
+                    if (result.info && result.info.some(msg => msg.includes('All requirements are already available!'))) {
+                        showStatus('All requirements are already available! ✅', 'success');
+                    } else {
+                        // Filter out the success message if not actually successful
+                        let message = 'Failed to install some requirements. Please install manually.\n';
+                        if (result.info && result.info.length) {
+                            const filteredInfo = result.info.filter(
+                                msg => msg !== 'Requirements installed successfully!' && 
+                                       !msg.includes('All requirements are already available!')
+                            );
+                            message += filteredInfo.join('\n') + '\n';
+                        }
+                        if (result.error && result.error.message) {
+                            message += 'Error: ' + result.error.message;
+                        } else if (result.error) {
+                            message += 'Error: ' + result.error;
+                        }
+                        showStatus(message, 'error');
+                    }
                 }
             } catch (error) {
                 showStatus(`Error: ${error.message}`, 'error');

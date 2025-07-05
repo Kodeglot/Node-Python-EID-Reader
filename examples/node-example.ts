@@ -1,4 +1,4 @@
-// Example: Using @kodeglot/belgian-eid-reader in Node.js
+// Example: Using @kodeglot/node-python-eid-reader in Node.js
 // This file demonstrates basic usage of the package
 
 import { readEidData, EidReader, EidReaderError, EidReaderOptions, checkRequirements, installRequirements, ReaderResult, EidData } from '@kodeglot/node-python-eid-reader';

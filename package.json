@@ -20,16 +20,12 @@
     "build": "tsc && npm run build:examples",
     "build:examples": "tsc -p tsconfig.examples.json",
     "prepublishOnly": "npm run build",
-    "start": "tsc && node dist/cli.js",
-    "dev": "tsc && node dist/cli.js",
     "check": "tsc && node -e \"(async () => { const { RequirementsChecker } = require('./dist/requirements-checker.js'); const checker = new RequirementsChecker(); const r = await checker.checkAllRequirements(); console.log('Requirements check completed:', r.passed ? 'PASSED' : 'FAILED'); })()\"",
     "test": "echo \"No tests specified\" && exit 0",
-    "example:node": "npm run build:examples && node examples/node-example.js",
+    "example:node": "npm run build:examples && node dist/examples/examples/node-example.js",
     "example:electron": "npm run build && electron dist/examples/examples/electron-example.js"
   },
-  "bin": {
-    "belgian-eid-reader": "./dist/cli.js"
-  },
+
   "dependencies": {
     "sudo-prompt": "^9.2.1"
   },
@@ -57,7 +53,7 @@
     "url": "https://github.com/Kodeglot/Node-Python-EID-Reader.git"
   },
   "publishConfig": {
-    "access": "restricted"
+    "access": "public"
   },
   "bugs": {
     "url": "https://github.com/Kodeglot/Node-Python-EID-Reader/issues"

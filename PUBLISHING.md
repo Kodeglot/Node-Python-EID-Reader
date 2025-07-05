@@ -1,6 +1,6 @@
 # Publishing Guide
 
-This document explains how to publish the `@kodeglot/belgian-eid-reader` package to npm.
+This document explains how to publish the `@kodeglot/node-python-eid-reader` package to npm.
 
 ## Pre-publishing Checklist
 
@@ -8,16 +8,14 @@ Before publishing, ensure:
 
 1. ✅ **Code is complete and tested**
    - All functionality works as expected
-   - CLI tool is functional
    - Examples are working
    - TypeScript declarations are generated
 
 2. ✅ **Package.json is properly configured**
-   - Name: `@kodeglot/belgian-eid-reader`
+   - Name: `@kodeglot/node-python-eid-reader`
    - Version: `1.0.0`
    - Main entry point: `dist/index.js`
    - Types: `dist/index.d.ts`
-   - Bin entry: `dist/cli.js`
    - Files array includes only necessary files
    - Organization scope: `@kodeglot`
 
@@ -30,7 +28,6 @@ Before publishing, ensure:
 4. ✅ **Build is successful**
    - TypeScript compilation works
    - All files are in `dist/` directory
-   - CLI is executable
 
 ## Publishing Steps
 
@@ -47,8 +44,7 @@ npm run build
 ### 3. Test the package locally (optional)
 ```bash
 npm pack
-npm install -g ./kodeglot-belgian-eid-reader-1.0.0.tgz
-belgian-eid-reader
+npm install ./kodeglot-node-python-eid-reader-1.0.0.tgz
 ```
 
 ### 4. Publish to npm
@@ -58,7 +54,7 @@ npm publish
 
 ### 5. Verify the package
 ```bash
-npm view @kodeglot/belgian-eid-reader
+npm view @kodeglot/node-python-eid-reader
 ```
 
 ## Post-publishing
@@ -67,8 +63,7 @@ npm view @kodeglot/belgian-eid-reader
 2. **Update the repository** with any final changes
 3. **Test the published package** in a clean environment:
    ```bash
-   npm install @kodeglot/belgian-eid-reader
-   npx @kodeglot/belgian-eid-reader
+   npm install @kodeglot/node-python-eid-reader
    ```
 
 ## Version Management
@@ -92,9 +87,8 @@ The published package includes:
 ## Distribution
 
 The package will be available:
-- **npm**: `npm install @kodeglot/belgian-eid-reader`
+- **npm**: `npm install @kodeglot/node-python-eid-reader`
 - **GitHub**: Source code and releases
-- **CLI**: `npx @kodeglot/belgian-eid-reader` or `npm install -g @kodeglot/belgian-eid-reader`
 
 ## Support
 

@@ -17,7 +17,7 @@ A cross-platform Node.js package to read Belgian eID card public data using Pyth
 ## Installation
 
 ```bash
-npm install @kodeglot/belgian-eid-reader
+npm install @kodeglot/node-python-eid-reader
 ```
 
 ## Prerequisites
@@ -33,7 +33,7 @@ Before using this package, you need to install:
 ### Basic Usage
 
 ```javascript
-import { readEidData } from '@kodeglot/belgian-eid-reader';
+import { readEidData } from '@kodeglot/node-python-eid-reader';
 
 try {
   const eidData = await readEidData();
@@ -47,7 +47,7 @@ try {
 ### Advanced Usage with Options
 
 ```javascript
-import { EidReader } from '@kodeglot/belgian-eid-reader';
+import { EidReader } from '@kodeglot/node-python-eid-reader';
 
 const reader = new EidReader({
   verbose: true,           // Enable detailed logging
@@ -68,7 +68,7 @@ try {
 ### Requirements Management
 
 ```javascript
-import { checkRequirements, installRequirements } from '@kodeglot/belgian-eid-reader';
+import { checkRequirements, installRequirements } from '@kodeglot/node-python-eid-reader';
 
 // Check if all requirements are met
 const result = await checkRequirements();
@@ -80,7 +80,16 @@ if (result.data && result.data.passed) {
   // Attempt to install missing requirements
   const installResult = await installRequirements();
   if (installResult.success) {
-    console.log('Requirements installed successfully!');
+    if (installResult.data && installResult.data.installed) {
+      console.log('Requirements installed successfully!');
+    } else {
+      console.log('All requirements are already available!');
+    }
+  } else {
+    console.log('Failed to install requirements:', installResult.info);
+    if (installResult.error) {
+      console.log('Error:', installResult.error.message);
+    }
   }
 }
 ```
@@ -117,7 +126,7 @@ new EidReader(options?: EidReaderOptions)
 
 - `readEidData(): Promise<EidData>` - Read eID data from the card
 - `checkRequirements(): Promise<{passed: boolean, results: any}>` - Check if requirements are met
-- `installRequirements(): Promise<boolean>` - Install missing requirements
+- `installRequirements(): Promise<ReaderResult<{installed: boolean}>>` - Install missing requirements
 
 ### `EidData` Interface
 
@@ -163,7 +172,7 @@ This package works seamlessly in Electron applications with built-in enable/disa
 
 ```javascript
 // main.js (Electron main process)
-import { readEidData } from '@kodeglot/belgian-eid-reader';
+import { readEidData } from '@kodeglot/node-python-eid-reader';
 
 let eidReaderEnabled = true; // Default to enabled
 
@@ -263,6 +272,32 @@ if (result.success) {
 
 - This ensures your UI accurately reflects the backend requirements check result.
 
+### Improved Requirements Installation
+
+The `installRequirements()` function now provides better feedback:
+
+- **All requirements available**: Returns success with "All requirements are already available!"
+- **Requirements installed**: Returns success with "Requirements installed successfully!"
+- **Installation failed**: Returns failure with detailed info and error messages
+
+Example handling in your UI:
+
+```js
+const result = await installRequirements();
+if (result.success) {
+  if (result.data && result.data.installed) {
+    console.log('Requirements installed successfully!');
+  } else {
+    console.log('All requirements are already available!');
+  }
+} else {
+  console.log('Failed to install requirements:', result.info);
+  if (result.error) {
+    console.log('Error:', result.error.message);
+  }
+}
+```
+
 ## Examples
 
 The package includes TypeScript examples demonstrating different usage patterns:
@@ -283,20 +318,7 @@ The examples are written in TypeScript and show:
 - Error handling and requirements management
 - Electron integration with IPC handlers
 
-## CLI Usage
 
-The package includes a CLI tool for testing:
-
-```bash
-# Install globally
-npm install -g @kodeglot/belgian-eid-reader
-
-# Run CLI
-belgian-eid-reader
-
-# Or run locally
-npx @kodeglot/belgian-eid-reader
-```
 
 ## Troubleshooting
 
@@ -404,5 +426,4 @@ If you encounter any issues:
 - Cross-platform support
 - Automatic dependency checking
 - Electron integration
-- Comprehensive error handling
-- CLI tool included 
+- Comprehensive error handling 

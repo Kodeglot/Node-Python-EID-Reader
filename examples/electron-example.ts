@@ -1,4 +1,4 @@
-// Example: Using @kodeglot/belgian-eid-reader in an Electron app
+// Example: Using @kodeglot/node-python-eid-reader in an Electron app
 // This file demonstrates how to integrate the package with Electron
 
 import { app, BrowserWindow, ipcMain, IpcMainInvokeEvent } from 'electron';

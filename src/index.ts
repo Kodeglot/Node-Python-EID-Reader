@@ -95,7 +95,13 @@ export class EidReader {
     this.info = [];
     try {
       this.addInfo('Checking for missing requirements...');
-      const { results } = await this.requirementsChecker.checkAllRequirements();
+      const { results, passed } = await this.requirementsChecker.checkAllRequirements();
+      
+      if (passed) {
+        this.addInfo('All requirements are already available!');
+        return { success: true, info: [...this.info], data: { installed: true } };
+      }
+      
       const installed = await this.requirementsChecker.installMissingRequirements(results);
       if (installed) {
         this.addInfo('Requirements installed successfully!');
