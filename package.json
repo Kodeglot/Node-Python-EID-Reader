@@ -1,17 +1,43 @@
 {
-  "name": "node-python-eid-reader",
-  "version": "0.1.0",
-  "description": "A cross-platform Node.js app to read Belgian eID card public data using Python eidreader",
+  "name": "@kodeglot/node-python-eid-reader",
+  "version": "1.0.0",
+  "description": "A cross-platform Node.js package to read Belgian eID card public data using Python eidreader with automatic dependency checking",
   "main": "dist/index.js",
-  "scripts": {
-    "build": "tsc",
-    "start": "tsc && node dist/index.js",
-    "dev": "tsc && node dist/index.js"
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
   },
-  "dependencies": {},
+  "files": [
+    "dist/**/*",
+    "examples/**/*",
+    "README.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "build": "tsc && npm run build:examples",
+    "build:examples": "tsc -p tsconfig.examples.json",
+    "prepublishOnly": "npm run build",
+    "start": "tsc && node dist/cli.js",
+    "dev": "tsc && node dist/cli.js",
+    "check": "tsc && node -e \"(async () => { const { RequirementsChecker } = require('./dist/requirements-checker.js'); const checker = new RequirementsChecker(); const r = await checker.checkAllRequirements(); console.log('Requirements check completed:', r.passed ? 'PASSED' : 'FAILED'); })()\"",
+    "test": "echo \"No tests specified\" && exit 0",
+    "example:node": "npm run build:examples && node examples/node-example.js",
+    "example:electron": "npm run build:examples && electron examples/electron-example.js"
+  },
+  "bin": {
+    "belgian-eid-reader": "./dist/cli.js"
+  },
+  "dependencies": {
+    "sudo-prompt": "^9.2.1"
+  },
   "devDependencies": {
     "@types/node": "^20.11.30",
-    "typescript": "^5.4.5"
+    "typescript": "^5.4.5",
+    "electron": "^28.0.0"
   },
   "keywords": [
     "eid",
@@ -19,12 +45,31 @@
     "identity-card",
     "python",
     "nodejs",
-    "cross-platform"
+    "electron",
+    "cross-platform",
+    "requirements-checker",
+    "pkcs11",
+    "smart-card"
   ],
   "author": "Kodeglot",
   "license": "MIT",
   "repository": {
     "type": "git",
     "url": "https://github.com/Kodeglot/Node-Python-EID-Reader.git"
-  }
+  },
+  "publishConfig": {
+    "access": "restricted"
+  },
+  "bugs": {
+    "url": "https://github.com/Kodeglot/Node-Python-EID-Reader/issues"
+  },
+  "homepage": "https://github.com/Kodeglot/Node-Python-EID-Reader#readme",
+  "engines": {
+    "node": ">=14.0.0"
+  },
+  "os": [
+    "darwin",
+    "win32",
+    "linux"
+  ]
 }
