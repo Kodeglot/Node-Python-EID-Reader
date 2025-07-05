@@ -2,7 +2,7 @@
 // This file demonstrates how to integrate the package with Electron
 
 import { app, BrowserWindow, ipcMain, IpcMainInvokeEvent } from 'electron';
-import { readEidData, EidReader, EidReaderError, EidReaderOptions, checkRequirements, installRequirements, ReaderResult, EidData } from '../dist/index.js';
+import { readEidData, EidReader, EidReaderError, EidReaderOptions, checkRequirements, installRequirements, ReaderResult, EidData } from '@kodeglot/node-python-eid-reader';
 import * as path from 'path';
 
 let mainWindow: BrowserWindow | null = null;
@@ -19,7 +19,7 @@ function createWindow(): void {
     }
   });
 
-  mainWindow.loadFile(path.join(app.getAppPath(), 'examples', 'index.html'));
+  mainWindow.loadFile(path.resolve(__dirname, '../../../examples/index.html'));
 }
 
 // Handle eID reading from renderer process
@@ -31,7 +31,7 @@ ipcMain.handle('read-eid', async (_event: IpcMainInvokeEvent, options: EidReader
       code: 'DISABLED'
     };
   }
-  
+
   const result: ReaderResult<EidData> = await readEidData(options);
   return result;
 });

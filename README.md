@@ -69,13 +69,15 @@ try {
 import { checkRequirements, installRequirements } from '@kodeglot/belgian-eid-reader';
 
 // Check if all requirements are met
-const { passed, results } = await checkRequirements();
-if (!passed) {
-  console.log('Missing requirements:', results);
-  
+const result = await checkRequirements();
+// NOTE: In Electron/Node.js integration, check result.data.passed, not result.passed
+if (result.data && result.data.passed) {
+  console.log('All requirements are met!');
+} else {
+  console.log('Missing requirements:', result.data?.results);
   // Attempt to install missing requirements
-  const installed = await installRequirements();
-  if (installed) {
+  const installResult = await installRequirements();
+  if (installResult.success) {
     console.log('Requirements installed successfully!');
   }
 }
@@ -240,6 +242,24 @@ The Electron integration includes:
 - **Automatic Blocking**: Reading operations are blocked when disabled
 - **State Persistence**: Status is maintained during the app session
 - **Error Handling**: Proper error codes for disabled state
+
+### Robust Requirements Check in Electron UI
+
+- The requirements check result is an object with a `data` property.
+- To check if all requirements are met, use `result.data.passed` in your UI code.
+- Example:
+
+```js
+if (result.success) {
+  if (result.data && result.data.passed) {
+    // All requirements are met
+  } else {
+    // Some requirements are missing
+  }
+}
+```
+
+- This ensures your UI accurately reflects the backend requirements check result.
 
 ## Examples
 
