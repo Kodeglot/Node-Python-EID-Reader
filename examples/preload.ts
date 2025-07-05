@@ -2,7 +2,7 @@
 // Safely exposes APIs to the renderer process
 
 import { contextBridge, ipcRenderer } from 'electron';
-import type { EidReaderOptions, EidData } from '../dist/index.js';
+import type { EidReaderOptions, EidData } from '@kodeglot/node-python-eid-reader';
 
 // Define the API interface for the renderer process
 interface EidAPI {
